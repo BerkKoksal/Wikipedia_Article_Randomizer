@@ -17,11 +17,21 @@ def home():
    return render_template("Template.html")
 
 def word_count():
+   article_url, article_title = get_random_article()
    
 
-@app.route("/Randomize.html/")
-def random():
-   
+   wiki_wiki = wikipediaapi.Wikipedia(
+    user_agent='WikipediaRandomGen/0.0 (erkanbobo33@gmail.com)',
+        language='en',
+        extract_format=wikipediaapi.ExtractFormat.WIKI
+   )
+
+   count_of_words = len(wiki_wiki.page(f"{article_title}").split())
+
+   return count_of_words
+
+
+def get_random_article():
    '''Code to generate a random wikipedia article. Also includes User_Agent'''
    wiki_topics = [
       "Mathematics",
@@ -51,8 +61,16 @@ def random():
    data = response.json()
    article_title = data['query']['random'][0]['title']
    article_url = f'https://en.wikipedia.org/wiki/{article_title}'
-   
-   return render_template("Randomize.html",  random_website = article_url, article_title = article_title )
+   return(article_url, article_title)
+
+
+
+@app.route("/Randomize.html/")
+def random():
+   article_url, article_title = get_random_article() #get random article 
+   word_count = word_count()
+
+   return render_template("Randomize.html",  random_website = article_url, article_title = article_title, word_count = word_count)
 
 
 if __name__ == "__main__":
