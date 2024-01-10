@@ -15,7 +15,7 @@ app = Flask(__name__)
 def home():
    
    wiki_topics = [
-      "Math",
+      "Mathematics",
       "Biology",
       "Physics",
       "Music",
@@ -46,7 +46,7 @@ def home():
    
 
    # response= requests.get(selected_page.fullurl, headers= headers)   
-   return render_template("Template.html", article_url = article_url, article_title = article_title)
+   return render_template("Template.html", todays_website = article_url, article_title = article_title)
     
 
 if __name__ == "__main__":
