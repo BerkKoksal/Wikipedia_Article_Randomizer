@@ -16,6 +16,9 @@ def home():
    
    return render_template("Template.html")
 
+def word_count():
+   
+
 @app.route("/Randomize.html/")
 def random():
    
