@@ -1,21 +1,49 @@
-from flask import Flask,redirect,url_for,render_template
+from flask import Flask,redirect,url_for,render_template,session
 import wikipediaapi
 import datetime
+from datetime import datetime
 import requests
 from bs4 import BeautifulSoup
 import nltk
 from nltk.tokenize import word_tokenize
 nltk.download('punkt')
-
+import random 
 app = Flask(__name__)
 
 
+app.secret_key = 'your_secret_key'  # Replace with a secret key for session management
 
+def get_random_hyperlink():
+    archive_url = 'https://endwalker.com/archive.html'
+    response = requests.get(archive_url)
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+        hyperlinks = [a['href'] for a in soup.find_all('a', href=True)]
+        return random.choice(hyperlinks)
+    else:
+        return None
 
 @app.route("/")
 def home():
+    headers = {
+        "User-Agent": "WikipediaRandomGen/0.0 (https://github.com/BerkKoksal/Wikipedia_Article_Randomizer; erkanbobo33@gmail.com)"
+    }
+
+    if 'current_hyperlink' not in session:
+        # If there is no stored hyperlink in the session, get a new one
+        session['current_hyperlink'] = get_random_hyperlink()
+
+    if datetime.time
+    return render_template("Template.html", article_title="a", todays_website=session['current_hyperlink'])
+
+@app.route("/refresh")
+def refresh():
+    # Refresh the stored hyperlink in the session
+    session['current_hyperlink'] = get_random_hyperlink()
+    return redirect(url_for('home'))
    
-   return render_template("Template.html")
+    
 
 def count(title):
    wiki_wiki = wikipediaapi.Wikipedia('WikipediaRandomGen/0.0 (erkanbobo33@gmail.com)', 'en')
@@ -46,20 +74,6 @@ def count(title):
 
 def get_random_article():
    '''Code to generate a random wikipedia article. Also includes User_Agent'''
-   wiki_topics = [
-      "Mathematics",
-      "Biology",
-      "Physics",
-      "Music",
-      "Geography",
-      "History",
-      "Technology"
-   ]
-   
-   day_of_the_week = datetime.datetime.today().weekday() #monday is 0, sunday is 6
-    
-   todays_topic = wiki_topics[day_of_the_week]
-  
    headers = {
       "User_Agent" : "WikipediaRandomGen/0.0 (https://github.com/BerkKoksal/Wikipedia_Article_Randomizer; erkanbobo33@gmail.com)"
       }
@@ -80,7 +94,7 @@ def get_random_article():
 
 
 @app.route("/Randomize.html/")
-def random():
+def regenerate():
    article_url, article_title = get_random_article() #get random article 
    word_count = count(article_title)
    read_time = word_count / 200
