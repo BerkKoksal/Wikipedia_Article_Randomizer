@@ -86,7 +86,8 @@ def get_random_article():
 def random():
    article_url, article_title = get_random_article() #get random article 
    word_count = count(article_title)
-   return render_template("Randomize.html",  random_website = article_url, article_title = article_title, word_count = word_count)
+   read_time = word_count / 200
+   return render_template("Randomize.html",  random_website = article_url, article_title = article_title, word_count = word_count, read_time = read_time)
 
 
 if __name__ == "__main__":
