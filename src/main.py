@@ -46,9 +46,8 @@ def home():
    
 
    # response= requests.get(selected_page.fullurl, headers= headers)   
-   return render_template("Template.html", article_url = article_url)
+   return render_template("Template.html", article_url = article_url, article_title =  article_title)
     
-
 
 if __name__ == "__main__":
     app.run()
