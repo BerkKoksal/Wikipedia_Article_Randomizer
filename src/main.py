@@ -11,11 +11,6 @@ app = Flask(__name__)
 
 
 
-def category_getter(title):
-   wiki_wiki = wikipediaapi.Wikipedia('WikipediaRandomGen/0.0 (erkanbobo33@gmail.com)', 'en')
-   page_py = wiki_wiki.page(title)
-   page_categories = page_py.categories
-   return page_categories
 
 @app.route("/")
 def home():
@@ -89,9 +84,7 @@ def random():
    article_url, article_title = get_random_article() #get random article 
    word_count = count(article_title)
    read_time = word_count / 200
-   categories= category_getter(article_title)
-   return render_template("Randomize.html",  random_website = article_url, article_title = article_title, word_count = word_count, read_time = read_time, 
-                          category = categories)
+   return render_template("Randomize.html",  random_website = article_url, article_title = article_title, word_count = word_count, read_time = read_time)
 
 
 if __name__ == "__main__":
