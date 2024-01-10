@@ -16,7 +16,7 @@ def home():
    
    return render_template("Template.html")
 
-@app.route("/Randomized.html/")
+@app.route("/Randomize.html/")
 def random():
    
    '''Code to generate a random wikipedia article. Also includes User_Agent'''
