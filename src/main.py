@@ -14,6 +14,12 @@ app = Flask(__name__)
 @app.route("/")
 def home():
    
+   return render_template("Template.html")
+
+@app.route("/Randomized.html/")
+def random():
+   
+   '''Code to generate a random wikipedia article. Also includes User_Agent'''
    wiki_topics = [
       "Mathematics",
       "Biology",
@@ -42,12 +48,9 @@ def home():
    data = response.json()
    article_title = data['query']['random'][0]['title']
    article_url = f'https://en.wikipedia.org/wiki/{article_title}'
-
    
+   return render_template("Randomize.html",  random_website = article_url, article_title = article_title )
 
-   # response= requests.get(selected_page.fullurl, headers= headers)   
-   return render_template("Template.html", todays_website = article_url, article_title = article_title)
-    
 
 if __name__ == "__main__":
     app.run()
