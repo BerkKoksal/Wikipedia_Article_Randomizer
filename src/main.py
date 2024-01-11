@@ -24,18 +24,26 @@ def get_random_hyperlink():
     else:
         return None
 
+def titleextractor(url:str):
+    title = url.replace("https://en.wikipedia.org/wiki/","")
+    return title
+
 @app.route("/")
 def home():
     headers = {
         "User-Agent": "WikipediaRandomGen/0.0 (https://github.com/BerkKoksal/Wikipedia_Article_Randomizer; erkanbobo33@gmail.com)"
     }
+    title = "default title"
 
     if 'current_hyperlink' not in session:
         # If there is no stored hyperlink in the session, get a new one
         session['current_hyperlink'] = get_random_hyperlink()
-
-    if datetime.time
-    return render_template("Template.html", article_title="a", todays_website=session['current_hyperlink'])
+       
+    
+    title = titleextractor(str(session['current_hyperlink']))
+    word_count = count(title)
+    read_time = word_count / 200
+    return render_template("Template.html", article_title= title.replace("_"," "), todays_website = session['current_hyperlink'], word_count = word_count, read_time = read_time)
 
 @app.route("/refresh")
 def refresh():
