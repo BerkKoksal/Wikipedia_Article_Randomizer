@@ -1,4 +1,4 @@
-from flask import Flask,redirect,url_for,render_template,session
+from flask import Flask,redirect,url_for,render_template,session,url_for
 import wikipediaapi
 import datetime
 from datetime import *
@@ -8,14 +8,28 @@ import nltk
 from nltk.tokenize import word_tokenize
 nltk.download('punkt')
 import random 
+from flask_mysqldb import MySQL
+import MySQLdb.cursors
+import re
+import hashlib
+from flask import request
 app = Flask(__name__)
 
     #global vars
 
 app.secret_key = 'essek'  # Replace with a secret key for session management
 
+    #database connection details
+app.config["MYSQL_HOST"] = "localhost"
+app.config["MYSQL_USER"] = "root"
+app.config["MYSQL_PASSWORD"] = "osas1234"
+app.config["MYSQL_DB"] = "userlogin"
 
-class globalvars: #global variables 
+    #initialize mysql
+mysql = MySQL(app)
+
+class globalvars:
+    '''global variable class going to be used for many functions'''
     shared_wikipedia_url = None
     last_update_time = None #when was site last updated?
     update_interval = 86400 #seconds = 1 day
@@ -78,16 +92,68 @@ def get_random_article():
    return(article_url, article_title)
 
 
+#login page
+@app.route("/login/", methods = ["GET", "POST"])
+def login():
+    #check if user submitted form is not empty
+    if request.method == "POST" and "username" in request.form and "password" in request.form:
+        #create vars username password
+        username = request.form["username"]
+        password = request.form["password"]
 
-@app.route("/Randomize.html/")
+        #get hashed password for encryption
+        hash = password + app.secret_key
+        hash = hashlib.sha1(hash.encode())
+        password = hash.hexdigest()
+
+        #check if account already exists
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute("SELECT * FROM accounts WHERE username = %s and password = %s",(username,password))
+        #fetch a record and return it
+        account = cursor.fetchone()
+
+        #if account exists
+        if account():
+            #create session data using dictionaries 
+            session["loggedin"] = True
+            session["id"] = account["id"]
+            msg = f"Welcome {account}" 
+
+            #Might want to put return statement to go back to home
+        else:
+            #account doesn't exist or wrong creditentials
+            msg = "Username/Password is incorrect."
+
+    return render_template("Home.html", msg = "")
+@app.route("Template.html/Randomize.html/")
 def regenerate():
    article_url, article_title = get_random_article() #get random article 
    word_count = count(article_title)
    read_time = read_time_f(word_count)
    return render_template("Randomize.html",  random_website = article_url, article_title = article_title, word_count = word_count, read_time = read_time)
 
+
+@app.route("/register/", methods = ["GET", "POST"])
+def register():
+    msg = ""
+    
+    if request.method == "POST" and "username" in request.form and "password" in request.form and "email" in request.form:
+        username = request.form["username"]
+        password = request.form["password"]
+        email = request.form["email"]
+
+    elif request.form == "POST":
+    #data submitted but empty
+        msg = "Please enter your information."
+
+    return render_template("home.html", msg = msg)
+
 @app.route("/")
 def home():
+    return render_template("Home.html")
+
+@app.route("/Template.html/")
+def dailyrandom():
     home = globalvars
     headers = {
         "User-Agent": "WikipediaRandomGen/0.0 (https://github.com/BerkKoksal/Wikipedia_Article_Randomizer; erkanbobo33@gmail.com)"
@@ -108,6 +174,15 @@ def home():
     read_time = read_time_f(word_count)
     return render_template("Template.html", article_title= title.replace("_"," "), todays_website = home.shared_wikipedia_url, word_count = word_count, read_time = read_time)
 
+@app.route("/logout/")
+def logout():
+    #remove session data from dictionary effectively removing userdata
+    session.pop("loggedin",None)
+    session.pop("id", None)
+    session.pop("username", None)
+
+    #return to ghome
+    return redirect(url_for("home"))
 @app.route("/refresh")
 def refresh():
     # Refresh the stored hyperlink in the session
