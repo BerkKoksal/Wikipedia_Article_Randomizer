@@ -12,11 +12,13 @@ app = Flask(__name__)
 
     #global vars
 
-class globalvars:
+app.secret_key = 'essek'  # Replace with a secret key for session management
+
+
+class globalvars: #global variables 
     shared_wikipedia_url = None
-    app.secret_key = 'your_secret_key'  # Replace with a secret key for session management
-    last_update_time = None
-    update_interval = 30
+    last_update_time = None #when was site last updated?
+    update_interval = 86400 #seconds = 1 day
 
 
 def get_random_hyperlink():
@@ -34,36 +36,6 @@ def titleextractor(url:str):
     title = url.replace("https://en.wikipedia.org/wiki/","")
     return title
 
-@app.route("/")
-def home():
-    home = globalvars
-    headers = {
-        "User-Agent": "WikipediaRandomGen/0.0 (https://github.com/BerkKoksal/Wikipedia_Article_Randomizer; erkanbobo33@gmail.com)"
-    }
-
-    # if 'current_hyperlink' not in session:
-    #     # If there is no stored hyperlink in the session, get a new one
-    #     session['current_hyperlink'] = get_random_hyperlink()
-    
-    current_time = datetime.now()
-    if home.last_update_time is None or (current_time - home.last_update_time).seconds >= home.update_interval:
-        home.last_update_time = current_time
-        home.shared_wikipedia_url = get_random_hyperlink()
-        home.last_update_time = current_time
-    
-    title = titleextractor(home.shared_wikipedia_url)
-    word_count = count(title)
-    read_time = read_time_f(word_count)
-    return render_template("Template.html", article_title= title.replace("_"," "), todays_website = home.shared_wikipedia_url, word_count = word_count, read_time = read_time)
-
-@app.route("/refresh")
-def refresh():
-    # Refresh the stored hyperlink in the session
-    session['current_hyperlink'] = get_random_hyperlink()
-    return redirect(url_for('home'))
-   
-    
-
 def count(title):
    wiki_wiki = wikipediaapi.Wikipedia('WikipediaRandomGen/0.0 (erkanbobo33@gmail.com)', 'en')
    page_py = wiki_wiki.page(title)
@@ -76,16 +48,12 @@ def count(title):
    
    return word_count
 
-
-
-
 def refrshsite(date_now):
     next_time = datetime(seconds = 10) 
     while(date_now < date_now + next_time):
         continue
     
     refresh()
-
 
 def read_time_f(word_count):
     return word_count / 200
@@ -117,6 +85,34 @@ def regenerate():
    word_count = count(article_title)
    read_time = read_time_f(word_count)
    return render_template("Randomize.html",  random_website = article_url, article_title = article_title, word_count = word_count, read_time = read_time)
+
+@app.route("/")
+def home():
+    home = globalvars
+    headers = {
+        "User-Agent": "WikipediaRandomGen/0.0 (https://github.com/BerkKoksal/Wikipedia_Article_Randomizer; erkanbobo33@gmail.com)"
+    }
+
+    # if 'current_hyperlink' not in session:
+    #     # If there is no stored hyperlink in the session, get a new one
+    #     session['current_hyperlink'] = get_random_hyperlink()
+    
+    current_time = datetime.now()
+    if home.last_update_time is None or (current_time - home.last_update_time).seconds >= home.update_interval:
+        home.last_update_time = current_time
+        home.shared_wikipedia_url = get_random_hyperlink()
+        home.last_update_time = current_time
+    
+    title = titleextractor(home.shared_wikipedia_url)
+    word_count = count(title)
+    read_time = read_time_f(word_count)
+    return render_template("Template.html", article_title= title.replace("_"," "), todays_website = home.shared_wikipedia_url, word_count = word_count, read_time = read_time)
+
+@app.route("/refresh")
+def refresh():
+    # Refresh the stored hyperlink in the session
+    session['current_hyperlink'] = get_random_hyperlink()
+    return redirect(url_for('home'))
 
 
 if __name__ == "__main__":
