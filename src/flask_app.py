@@ -20,10 +20,10 @@ app = Flask(__name__)
 app.secret_key = 'essek'  # Replace with a secret key for session management
 
     #database connection details
-app.config["MYSQL_HOST"] = "localhost"
-app.config["MYSQL_USER"] = "root"
+app.config["MYSQL_HOST"] = "BerkK.mysql.pythonanywhere-services.com"
+app.config["MYSQL_USER"] = "BerkK"
 app.config["MYSQL_PASSWORD"] = "osas1234"
-app.config["MYSQL_DB"] = "userlogin"
+app.config["MYSQL_DB"] = "BerkK$userlogin"
 
     #initialize mysql
 mysql = MySQL(app)
@@ -125,7 +125,7 @@ def login():
             msg = "Username/Password is incorrect."
 
     return render_template("Home.html", msg = "")
-@app.route("Template.html/Randomize.html/")
+@app.route("/Template.html/Randomize.html/")
 def regenerate():
    article_url, article_title = get_random_article() #get random article 
    word_count = count(article_title)
@@ -146,11 +146,50 @@ def register():
     #data submitted but empty
         msg = "Please enter your information."
 
+    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute("SELECT FROM accounts WHERE username = %s",(username,))
+    account = cursor.fetchone
+
+    #check if account exists 
+    if account:
+        msg = "Account already exists! Please try logging in."
+    
+    #if doesn't exist check these conditions:
+    elif not re.match(r"[A-Za-z0-9]+", username):
+        msg = "Username can only contain letters and numbers!"
+    elif not re.match(r"[^@] + @[^@]+\.[^@]+", email):
+        msg = "Please enter a valid email."
+
+    elif not username or password or email:
+        msg = "Please fill out the form!"
+    
+    else:
+        #hash the password
+        hash = password + app.secret_key
+        hash = hashlib.sha1(hash.encode())
+        password = hash.hexdigest()
+
+        #insert account details into new row
+    cursor.execute("INSTERT INTO accounts VALUES (Null, %s,%s,%s)",(username,password,email,))
+    mysql.connection.commit()
+    msg = f"Your account has been registered, welcome {account}!"
     return render_template("home.html", msg = msg)
 
 @app.route("/")
 def home():
     return render_template("Home.html")
+
+@app.rout("/WikiBattle.html/")
+def wikibattle():
+    if session["loggedin"] == True:
+        #user is logged in
+        return render_template("home.html", username = session["username"])
+
+    else:
+        return redirect(url_for("login"))
+
+    
+
 
 @app.route("/Template.html/")
 def dailyrandom():
