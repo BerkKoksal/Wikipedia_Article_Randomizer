@@ -15,6 +15,7 @@ import hashlib
 from flask import request
 app = Flask(__name__)
 
+
     #global vars
 
 app.secret_key = 'essek'  # Replace with a secret key for session management
@@ -93,7 +94,7 @@ def get_random_article():
 
 
 #login page
-@app.route("/login/", methods = ["GET", "POST"])
+@app.route("/login/", methods = ["POST"])
 def login():
     #check if user submitted form is not empty
     if request.method == "POST" and "username" in request.form and "password" in request.form:
@@ -117,14 +118,16 @@ def login():
             #create session data using dictionaries 
             session["loggedin"] = True
             session["id"] = account["id"]
-            msg = f"Welcome {account}" 
+            msg = f"Welcome {account}"
+            return(msg)
 
             #Might want to put return statement to go back to home
         else:
             #account doesn't exist or wrong creditentials
             msg = "Username/Password is incorrect."
+            return(msg)
 
-    return render_template("Home.html", msg = "")
+
 @app.route("/Template.html/Randomize.html/")
 def regenerate():
    article_url, article_title = get_random_article() #get random article 
@@ -179,7 +182,7 @@ def register():
 def home():
     return render_template("Home.html")
 
-@app.rout("/WikiBattle.html/")
+@app.route("/WikiBattle.html/")
 def wikibattle():
     if session["loggedin"] == True:
         #user is logged in
