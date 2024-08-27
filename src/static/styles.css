@@ -113,3 +113,17 @@ nav a:hover::before{
     box-shadow: 0px 0px 20px rgba(0, 0, 0.5);
 
 }
+
+.coming-soon {
+    color: red;
+    font-style: italic;
+    font-size: 0.8em;
+    margin-left: 5px;
+}
+
+.image-caption {
+    text-align: center;
+    font-style: italic;
+    color: red;
+    margin-top: -10px;
+}

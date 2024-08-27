@@ -128,7 +128,7 @@ def login():
             return(msg)
 
 
-@app.route("/Template.html/Randomize.html/")
+@app.route("/Randomize/")
 def regenerate():
    article_url, article_title = get_random_article() #get random article 
    word_count = count(article_title)
@@ -194,7 +194,7 @@ def wikibattle():
     
 
 
-@app.route("/Template.html/")
+@app.route("/Daily/")
 def dailyrandom():
     home = globalvars
     headers = {
@@ -233,5 +233,7 @@ def refresh():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(debug= True)
+
+
 
