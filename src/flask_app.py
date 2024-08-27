@@ -8,8 +8,8 @@ import nltk
 from nltk.tokenize import word_tokenize
 nltk.download('punkt')
 import random 
-from flask_mysqldb import MySQL
-import MySQLdb.cursors
+# from flask_mysqldb import MySQL
+# import MySQLdb.cursors
 import re
 import hashlib
 from flask import request
@@ -21,13 +21,13 @@ app = Flask(__name__)
 app.secret_key = 'essek'  # Replace with a secret key for session management
 
     #database connection details
-app.config["MYSQL_HOST"] = "BerkK.mysql.pythonanywhere-services.com"
-app.config["MYSQL_USER"] = "BerkK"
-app.config["MYSQL_PASSWORD"] = "osas1234"
-app.config["MYSQL_DB"] = "BerkK$userlogin"
+# app.config["MYSQL_HOST"] = "BerkK.mysql.pythonanywhere-services.com"
+# app.config["MYSQL_USER"] = "BerkK"
+# app.config["MYSQL_PASSWORD"] = "osas1234"
+# app.config["MYSQL_DB"] = "BerkK$userlogin"
 
     #initialize mysql
-mysql = MySQL(app)
+# mysql = MySQL(app)
 
 class globalvars:
     '''global variable class going to be used for many functions'''
@@ -94,38 +94,38 @@ def get_random_article():
 
 
 #login page
-@app.route("/login/", methods = ["POST"])
-def login():
-    #check if user submitted form is not empty
-    if request.method == "POST" and "username" in request.form and "password" in request.form:
-        #create vars username password
-        username = request.form["username"]
-        password = request.form["password"]
+# @app.route("/login/", methods = ["POST"])
+# def login():
+#     #check if user submitted form is not empty
+#     if request.method == "POST" and "username" in request.form and "password" in request.form:
+#         #create vars username password
+#         username = request.form["username"]
+#         password = request.form["password"]
 
-        #get hashed password for encryption
-        hash = password + app.secret_key
-        hash = hashlib.sha1(hash.encode())
-        password = hash.hexdigest()
+#         #get hashed password for encryption
+#         hash = password + app.secret_key
+#         hash = hashlib.sha1(hash.encode())
+#         password = hash.hexdigest()
 
-        #check if account already exists
-        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute("SELECT * FROM accounts WHERE username = %s and password = %s",(username,password))
-        #fetch a record and return it
-        account = cursor.fetchone()
+#         #check if account already exists
+#         # cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#         # cursor.execute("SELECT * FROM accounts WHERE username = %s and password = %s",(username,password))
+#         #fetch a record and return it
+#         # account = cursor.fetchone()
 
-        #if account exists
-        if account():
-            #create session data using dictionaries 
-            session["loggedin"] = True
-            session["id"] = account["id"]
-            msg = f"Welcome {account}"
-            return(msg)
+#         #if account exists
+#         if account():
+#             #create session data using dictionaries 
+#             session["loggedin"] = True
+#             session["id"] = account["id"]
+#             msg = f"Welcome {account}"
+#             return(msg)
 
-            #Might want to put return statement to go back to home
-        else:
-            #account doesn't exist or wrong creditentials
-            msg = "Username/Password is incorrect."
-            return(msg)
+#             #Might want to put return statement to go back to home
+#         else:
+#             #account doesn't exist or wrong creditentials
+#             msg = "Username/Password is incorrect."
+#             return(msg)
 
 
 @app.route("/Randomize/")
@@ -136,47 +136,47 @@ def regenerate():
    return render_template("Randomize.html",  random_website = article_url, article_title = article_title, word_count = word_count, read_time = read_time)
 
 
-@app.route("/register/", methods = ["GET", "POST"])
-def register():
-    msg = ""
+# @app.route("/register/", methods = ["GET", "POST"])
+# def register():
+#     msg = ""
     
-    if request.method == "POST" and "username" in request.form and "password" in request.form and "email" in request.form:
-        username = request.form["username"]
-        password = request.form["password"]
-        email = request.form["email"]
+#     if request.method == "POST" and "username" in request.form and "password" in request.form and "email" in request.form:
+#         username = request.form["username"]
+#         password = request.form["password"]
+#         email = request.form["email"]
 
-    elif request.form == "POST":
-    #data submitted but empty
-        msg = "Please enter your information."
+#     elif request.form == "POST":
+#     #data submitted but empty
+#         msg = "Please enter your information."
 
-    cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-    cursor.execute("SELECT FROM accounts WHERE username = %s",(username,))
-    account = cursor.fetchone
+#     cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+#     cursor.execute("SELECT FROM accounts WHERE username = %s",(username,))
+#     account = cursor.fetchone
 
-    #check if account exists 
-    if account:
-        msg = "Account already exists! Please try logging in."
+#     #check if account exists 
+#     if account:
+#         msg = "Account already exists! Please try logging in."
     
-    #if doesn't exist check these conditions:
-    elif not re.match(r"[A-Za-z0-9]+", username):
-        msg = "Username can only contain letters and numbers!"
-    elif not re.match(r"[^@] + @[^@]+\.[^@]+", email):
-        msg = "Please enter a valid email."
+#     #if doesn't exist check these conditions:
+#     elif not re.match(r"[A-Za-z0-9]+", username):
+#         msg = "Username can only contain letters and numbers!"
+#     elif not re.match(r"[^@] + @[^@]+\.[^@]+", email):
+#         msg = "Please enter a valid email."
 
-    elif not username or password or email:
-        msg = "Please fill out the form!"
+#     elif not username or password or email:
+#         msg = "Please fill out the form!"
     
-    else:
-        #hash the password
-        hash = password + app.secret_key
-        hash = hashlib.sha1(hash.encode())
-        password = hash.hexdigest()
+#     else:
+#         #hash the password
+#         hash = password + app.secret_key
+#         hash = hashlib.sha1(hash.encode())
+#         password = hash.hexdigest()
 
-        #insert account details into new row
-    cursor.execute("INSTERT INTO accounts VALUES (Null, %s,%s,%s)",(username,password,email,))
-    mysql.connection.commit()
-    msg = f"Your account has been registered, welcome {account}!"
-    return render_template("home.html", msg = msg)
+#         #insert account details into new row
+#     cursor.execute("INSTERT INTO accounts VALUES (Null, %s,%s,%s)",(username,password,email,))
+#     mysql.connection.commit()
+#     msg = f"Your account has been registered, welcome {account}!"
+#     return render_template("home.html", msg = msg)
 
 @app.route("/")
 def home():
