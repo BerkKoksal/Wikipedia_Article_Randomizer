@@ -53,6 +53,9 @@
 
 <body>
     <header>
+        <a href = "/">
+            <img src="../static/logo.png" alt="Wikitools" style ="height: 5vw; width: 10vw;">
+            </a>
         <h1>Daily Random Wikipedia Article</h1>
     </header>
     <section>
@@ -60,7 +63,8 @@
             <iframe src="{{todays_website}}" style="height: 1300px; width: 100%;"></iframe>
         </div>
         <aside>
-            <a href="Randomize.html">
+            <p><strong>Read Today's article? Read another random one!</strong></p>
+            <a href="/Randomize/">
             <button>Regenerate</button>
             </a>
             <p>Today's Topic: {{article_title}} </p>
